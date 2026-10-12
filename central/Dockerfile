@@ -8,6 +8,6 @@ COPY wm_common ./wm_common
 COPY central/ .
 # Estado persistente (SQLite): montar un volumen en /data
 ENV WM_DB_PATH=/data/central.db WM_SOCKET_PORT=9000 PORT=8080
-VOLUME ["/data"]
+# VOLUME ["/data"]
 EXPOSE 8080 9000
 CMD ["python", "WM_Central.py"]
