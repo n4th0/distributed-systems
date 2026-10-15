@@ -1,5 +1,5 @@
 # Build context = raíz del repositorio (necesita wm_common/)
-FROM python:3.11-slim
+FROM python:3.11-slim-bookworm
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
 WORKDIR /app
 COPY central/requirements.txt .
