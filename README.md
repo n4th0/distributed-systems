@@ -117,20 +117,39 @@ CI/CD resultante: **VS Code → GitHub → Railway** (cada `git push` a `main` r
 
 ## 3. Despliegue en el laboratorio (solo FO y WS)
 
-En **ambos PC**: Docker + Git instalados.
+<!-- En **ambos PC**: Docker + Git instalados. -->
+<!---->
+<!-- ```bash -->
+<!-- git clone https://github.com/<usuario>/<repo>.git && cd <repo> -->
+<!-- cp .env.example .env     # edítalo con KAFKA_PUBLIC_ADDR y CENTRAL_SOCKET_ADDR de Railway -->
+<!-- ``` -->
+<!---->
+<!-- **PC LAB 2 — estaciones (2 WS, cada una con Monitor + Engine):** -->
+<!---->
+<!-- ```bash -->
+<!-- docker compose -f docker-compose.lab-ws.yml --env-file .env up --build -d -->
+<!-- docker attach wm-engine-1        # menú del Engine 1 (Ctrl+P, Ctrl+Q para soltarlo) -->
+<!-- docker attach wm-engine-2 -->
+<!-- ``` -->
 
-```bash
-git clone https://github.com/<usuario>/<repo>.git && cd <repo>
-cp .env.example .env     # edítalo con KAFKA_PUBLIC_ADDR y CENTRAL_SOCKET_ADDR de Railway
-```
+# Construir una vez
+docker compose build
 
-**PC LAB 2 — estaciones (2 WS, cada una con Monitor + Engine):**
+# Monitors (en segundo plano)
+docker compose run -d --rm --name wm-monitor-1 -e WM_WS_ID=WS-01 -e WM_WS_LOCATION="River Park" -e WM_WS_SECRET=s3cret-1 monitor
+docker compose run -d --rm --name wm-monitor-2 -e WM_WS_ID=WS-02 -e WM_WS_LOCATION="Central Park" -e WM_WS_SECRET=s3cret-2 monitor
+docker compose run -d --rm --name wm-monitor-3 -e WM_WS_ID=WS-03 -e WM_WS_LOCATION="Lake" -e WM_WS_SECRET=s3cret-3 monitor
 
-```bash
-docker compose -f docker-compose.lab-ws.yml --env-file .env up --build -d
-docker attach wm-engine-1        # menú del Engine 1 (Ctrl+P, Ctrl+Q para soltarlo)
-docker attach wm-engine-2
-```
+# Engines (interactivos, uno por terminal), conectados al monitor que quieras
+docker compose run --rm --name wm-engine-1 -e WM_MONITOR=wm-monitor-1:7001 engine
+docker compose run --rm --name wm-engine-2 -e WM_MONITOR=wm-monitor-3:7001 engine   # otro engine al monitor 3
+docker compose run --rm --name wm-engine-3 -e WM_MONITOR=wm-monitor-1:7001 engine   # dos engines al mismo monitor
+
+# Parar un monitor
+docker stop wm-monitor-2
+
+
+
 
 **PC LAB 1 — operarios (2 FO):** abre dos terminales:
 
@@ -144,6 +163,26 @@ docker compose -f docker-compose.lab-fo.yml --env-file .env run --rm fo1 python 
 
 Para añadir más estaciones u operarios: duplica un bloque `monitorN/engineN` cambiando `WM_WS_ID`, ubicación, secreto y
 puerto interno (cada pareja usa su propia red de contenedores por nombre, no hace falta cambiar el 7001), o añade ids a `WM_OPERATORS`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ---
 
